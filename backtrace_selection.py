@@ -1,4 +1,4 @@
-# Backtrace a registry selected.
+# Backtrace a selected register.
 
 # DISCLAIMER: This is a recreation of a Java Ghidra script for example
 # use only. Please run the Java version in a production environment.
@@ -20,8 +20,6 @@ else:
      print "No selection or current address to color"
 
 addresses_to_color = ghidra.program.model.address.AddressSet()
-# addresses_to_color.add(currentAddress.add(10))
-# addresses_to_color.add(currentAddress.add(11))
 
 
 registers_to_trace = ['RAX','RBX','RCX','RDX','RSI','RDI','RBP','R8','R9','R10','R11','R12','R13','R14','R15']
