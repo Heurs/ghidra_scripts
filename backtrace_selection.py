@@ -12,13 +12,6 @@ from java.awt import Color
 service = state.getTool().getService(ghidra.app.plugin.core.colorizer.ColorizingService)
 if service is None:
      print "Can't find ColorizingService service"
-if currentSelection is not None:
-     service.setBackgroundColor(currentSelection, Color(255, 200, 200))
-elif currentAddress is not None:
-     service.setBackgroundColor(currentAddress, currentAddress, Color(255, 200, 200))
-else:
-     print "No selection or current address to color"
-
 addresses_to_color = ghidra.program.model.address.AddressSet()
 
 registers_to_trace = ['EAX','EBX','ECX','EDX','ESI','EDI','RAX','RBX','RCX','RDX','RSI','RDI','RBP','R8','R9','R10','R11','R12','R13','R14','R15']
