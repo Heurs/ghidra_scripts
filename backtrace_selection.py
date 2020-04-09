@@ -21,8 +21,7 @@ else:
 
 addresses_to_color = ghidra.program.model.address.AddressSet()
 
-
-registers_to_trace = ['RAX','RBX','RCX','RDX','RSI','RDI','RBP','R8','R9','R10','R11','R12','R13','R14','R15']
+registers_to_trace = ['EAX','EBX','ECX','EDX','ESI','EDI','RAX','RBX','RCX','RDX','RSI','RDI','RBP','R8','R9','R10','R11','R12','R13','R14','R15']
 
 def get_write_register(instruction):
     # instruction.getPcode()[1].getOutput().isRegister()
