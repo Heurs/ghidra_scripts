@@ -32,20 +32,38 @@ handled_instructions = {
 }
 
 mainFunctionEntry = currentAddress
+end_addr = -1
+
+ceslection = currentSelection
+if ceslection != None:
+    min_addr = None
+    for csel in ceslection.getAddressRanges():
+        if min_addr == None:
+            min_addr = csel.getMinAddress().getOffset()
+        if min_addr > csel.getMaxAddress().getOffset():
+            min_addr = csel.getMaxAddress().getOffset()
+        if end_addr < csel.getMaxAddress().getOffset():
+            end_addr = csel.getMaxAddress().getOffset()
+    end_addr = toAddr(end_addr)
+    mainFunctionEntry = toAddr(min_addr)
 mainFuncLong = int("0x{}".format(mainFunctionEntry), 16)
 emuHelper.writeRegister(emuHelper.getPCRegister(), mainFuncLong)
 
-monitor = ghidra.util.task.ConsoleTaskMonitor()
 count = askInt("Number of instructions", "enter instructions count")
+monitor = ghidra.util.task.ConsoleTaskMonitor()
+
 while monitor.isCancelled() is False:
         executionAddress = emuHelper.getExecutionAddress()  
         if (count <= 0):
-            print("Emulation complete.")
+            print("Emulation complete (count down).")
+            break
+        if end_addr == executionAddress:
+            print("Emulation complete (end address).")
             break
         
         cinstr = getInstructionAt(executionAddress)
         
-        print("Address: 0x{} ({})".format(executionAddress, cinstr))
+        print("0x{} {}".format(executionAddress, cinstr))
         for i in range(len(reg_filter)):
             creg = reg_filter[i]
             prev_val = reg_state[i]
