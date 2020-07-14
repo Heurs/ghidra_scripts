@@ -30,6 +30,9 @@ def parse_UNWIND_INFO(start_rt, end_rt, unwind_rt):
                 createMemoryReference(createDWord(toAddr(unwind_rt+size_header+(cexpId*0x10)+4)), toAddr(end_func+imagebase), ghidra.program.model.symbol.RefType.DATA)
                 exp_func = getInt(toAddr(unwind_rt+size_header+(cexpId*0x10)+8))
                 createMemoryReference(createDWord(toAddr(unwind_rt+size_header+(cexpId*0x10)+8)), toAddr(exp_func+imagebase), ghidra.program.model.symbol.RefType.DATA)
+                jmp_func = getInt(toAddr(unwind_rt+size_header+(cexpId*0x10)+0xc))
+                if jmp_func != 0:
+                    createMemoryReference(createDWord(toAddr(unwind_rt+size_header+(cexpId*0x10)+0xc)), toAddr(jmp_func+imagebase), ghidra.program.model.symbol.RefType.DATA)
                 print "  Handler %x" % (exp_func+imagebase)
     
 
