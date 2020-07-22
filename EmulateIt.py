@@ -10,15 +10,12 @@ emuHelper = ghidra.app.emulator.EmulatorHelper(currentProgram)
 # emuHelper.writeMemoryValue(toAddr(0x000000000008C000), 4, 0x99AABBCC)
 # emuHelper.writeMemory(toAddr(0x00000000000CF000), b'\x99\xAA\xBB\xCC')
 
-reg_filter = [
-    "RAX", "RBX", "RCX", "RDX", "RSI", "RDI", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15",
-    "RSP", "RBP", "rflags"
-]
-
-reg_state = ["RAX", "RBX", "RCX", "RDX", "RSI", "RDI", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15",
-    "RSP", "RBP", "rflags"]
-reg_state_prev = ["RAX", "RBX", "RCX", "RDX", "RSI", "RDI", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15",
-    "RSP", "RBP", "rflags"]
+if str(emuHelper.getLanguage()) == "x86/little/32/default":
+    reg_filter = ["EAX", "EBX", "ECX", "EDX", "ESI", "EDI", "ESP", "EBP", "eflags"]
+    reg_state = ["EAX", "EBX", "ECX", "EDX", "ESI", "EDI", "ESP", "EBP", "eflags"]
+elif str(emuHelper.getLanguage()) == "x86/little/64/default":
+    reg_filter = ["RAX", "RBX", "RCX", "RDX", "RSI", "RDI", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "RSP", "RBP", "rflags"]
+    reg_state = ["RAX", "RBX", "RCX", "RDX", "RSI", "RDI", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "RSP", "RBP", "rflags"]
 
 import random
 cycles = random.randint(0,0xffffffffffffffff)
@@ -30,6 +27,12 @@ def do_rdtsc():
 handled_instructions = {
     "RDTSC" : do_rdtsc,
 }
+
+
+# emuHelper.writeRegister("RBX", 0xf7fff8c000000000)
+# emuHelper.writeRegister("RCX", 0xfffff8c000000000)
+# emuHelper.writeRegister("RDX", 0xfffff8c100000000)
+# emuHelper.writeRegister("RSP", 0xfffff8c200000000)
 
 mainFunctionEntry = currentAddress
 end_addr = -1
@@ -49,12 +52,12 @@ if ceslection != None:
 mainFuncLong = int("0x{}".format(mainFunctionEntry), 16)
 emuHelper.writeRegister(emuHelper.getPCRegister(), mainFuncLong)
 
-count = askInt("Number of instructions", "enter instructions count")
+count_max = askInt("Number of instructions", "enter instructions count")
 monitor = ghidra.util.task.ConsoleTaskMonitor()
-
+count = 0
 while monitor.isCancelled() is False:
         executionAddress = emuHelper.getExecutionAddress()  
-        if (count <= 0):
+        if (count > count_max):
             print("Emulation complete (count down).")
             break
         if end_addr == executionAddress:
@@ -63,7 +66,7 @@ while monitor.isCancelled() is False:
         
         cinstr = getInstructionAt(executionAddress)
         
-        print("0x{} {}".format(executionAddress, cinstr))
+        print("{:#08d} 0x{} {}".format(count, executionAddress, cinstr))
         if cinstr.getMnemonicString() in handled_instructions:
             handled_instructions[cinstr.getMnemonicString()]()
             mainFunctionEntry = currentAddress
@@ -75,13 +78,20 @@ while monitor.isCancelled() is False:
         for i in range(len(reg_filter)):
             creg = reg_filter[i]
             prev_val = reg_state[i]
+            # print dir(emuHelper)
             reg_val = emuHelper.readRegister(creg)
             if reg_val != prev_val:
-                print("  {} = {:#018x}".format(creg, reg_val))
+                print("                                      {} = {:#018x}".format(creg, reg_val))
                 reg_state[i] = reg_val
         if (success == False):
             lastError = emuHelper.getLastError()
             printerr("Emulation Error: '{}'".format(lastError))
             break
         cycles += 1
-        count -= 1
+        count += 1
+
+for i in range(len(reg_filter)):
+    creg = reg_filter[i]
+    reg_val = emuHelper.readRegister(creg)
+    print("  {} = {:#018x}".format(creg, reg_val))
+    reg_state[i] = reg_val
