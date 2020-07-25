@@ -16,6 +16,9 @@ if str(emuHelper.getLanguage()) == "x86/little/32/default":
 elif str(emuHelper.getLanguage()) == "x86/little/64/default":
     reg_filter = ["RAX", "RBX", "RCX", "RDX", "RSI", "RDI", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "RSP", "RBP", "rflags"]
     reg_state = ["RAX", "RBX", "RCX", "RDX", "RSI", "RDI", "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R15", "RSP", "RBP", "rflags"]
+else:
+    reg_filter = [a for a in currentProgram.getProgramContext().registers]
+    reg_state = [a for a in currentProgram.getProgramContext().registers]
 
 import random
 cycles = random.randint(0,0xffffffffffffffff)
