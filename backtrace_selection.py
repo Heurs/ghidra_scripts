@@ -14,7 +14,12 @@ if service is None:
      print "Can't find ColorizingService service"
 addresses_to_color = ghidra.program.model.address.AddressSet()
 
-registers_to_trace = ['EAX','EBX','ECX','EDX','ESI','EDI','RAX','RBX','RCX','RDX','RSI','RDI','RBP','R8','R9','R10','R11','R12','R13','R14','R15']
+if str(getCurrentProgram().getLanguage()) == "x86/little/32/default":
+    registers_to_trace = ["EAX", "EBX", "ECX", "EDX", "ESI", "EDI", "ESP", "EBP", "eflags"]
+elif str(getCurrentProgram().getLanguage()) == "x86/little/64/default":
+    registers_to_trace = ['EAX','EBX','ECX','EDX','ESI','EDI','RAX','RBX','RCX','RDX','RSI','RDI','RBP','R8','R9','R10','R11','R12','R13','R14','R15']
+else:
+    registers_to_trace = [a for a in currentProgram.getProgramContext().registers]
 
 def get_write_register(instruction):
     # instruction.getPcode()[1].getOutput().isRegister()
